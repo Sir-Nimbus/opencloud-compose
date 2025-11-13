@@ -2,6 +2,9 @@
 
 This repository provides Docker Compose configurations for deploying OpenCloud in various environments.
 
+> [!IMPORTANT]
+> Please use the [official docs](https://docs.opencloud.eu/docs/admin/getting-started/container/docker-compose/docker-compose-base) for a **Production Deployment**.
+
 ## Overview
 
 OpenCloud Compose offers a modular approach to deploying OpenCloud with several configuration options:
@@ -13,6 +16,7 @@ OpenCloud Compose offers a modular approach to deploying OpenCloud with several 
 - **Full text search** with Apache Tika for content extraction and metadata analysis
 - **Monitoring** with metrics endpoints for observability and performance monitoring
 - **Radicale** integration for Calendar and Contacts
+- **ClamAV** antivirus scanning with ClamAV
 
 ## Quick Start Guide
 
@@ -72,26 +76,6 @@ OpenCloud Compose offers a modular approach to deploying OpenCloud with several 
    - URL: https://cloud.opencloud.test
    - Username: `admin`
    - Password: value of your `INITIAL_ADMIN_PASSWORD`
-
-### Production Deployment
-
-> **DNS Requirements**: For production deployments, you need real DNS entries pointing to your server for all required subdomains. You can either create individual DNS A/AAAA records for each subdomain (e.g., `cloud.example.com`, `collabora.example.com`, `keycloak.example.com`) or use a wildcard DNS entry (`*.example.com`) that covers all subdomains.
-
-1. **Edit the `.env` file** and configure:
-   - Domain names (replace `.opencloud.test` domains with your real domains)
-   - Admin password
-   - SSL certificate email
-   - Storage paths
-
-2. **Configure deployment options** in `.env`:
-   ```
-   COMPOSE_FILE=docker-compose.yml:weboffice/collabora.yml:traefik/opencloud.yml:traefik/collabora.yml
-   ```
-
-3. **Start OpenCloud**:
-   ```bash
-   docker compose up -d
-   ```
 
 ## Deployment Options
 
@@ -239,6 +223,25 @@ This exposes the necessary ports:
 **Please note:**
 If you're using **Nginx Proxy Manager (NPM)**, you **should NOT** activate **"Block Common Exploits"** for the Proxy Host.
 Otherwise, the desktop app authentication will return **error 403 Forbidden**.
+
+### ClamAV anti-virus
+
+Enable anti-virus scans for uploaded files.
+
+Using `-f` flags:
+```bash
+docker compose -f docker-compose.yml -f antivirus/clamav.yml -f traefik/opencloud.yml up -d
+```
+
+Or by setting in `.env`:
+```
+COMPOSE_FILE=docker-compose.yml:antivirus/clamav.yml:traefik/opencloud.yml
+```
+
+**Important:** adjust the variable in `.env` to start the antivirus service. Add additional services separated by comma, e.g. `notifications,antivirus`:
+```
+START_ADDITIONAL_SERVICES="antivirus"
+```
 
 
 ## SSL Certificate Support
