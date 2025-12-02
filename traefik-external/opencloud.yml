@@ -12,5 +12,6 @@ services:
       - "traefik.http.routers.opencloud.service=opencloud"
       - "traefik.http.services.opencloud.loadbalancer.server.port=9200"
       - "traefik.http.routers.opencloud.${TRAEFIK_SERVICES_TLS_CONFIG}"
+      - "traefik.http.routers.opencloud.tls=true"
     networks:
       - frontend #${PROXY_NETWORK:-frontend}
